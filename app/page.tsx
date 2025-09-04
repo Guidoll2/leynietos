@@ -1,103 +1,213 @@
-import Image from "next/image";
+"use client"
+
+import { useState, useEffect } from "react"
+import { StatsCard } from "./components/stats-card"
+import { ApplicationForm } from "./components/application-form"
+import { DateFilters } from "./components/date-filters"
+import { ApplicationsList } from "./components/applications-list"
+import { Clock, CheckCircle, Mail, FileText, Users } from "lucide-react"
+import { IconWrapper } from "./components/ui/icon"
+
+interface Stats {
+  total: number
+  enEspera: number
+  resueltos: number
+  conConfirmacion: number
+  conDocumentacionAdicional: number
+}
+
+interface Application {
+  _id: string
+  nombre: string
+  apellido?: string
+  fechaTramite: string
+  mailConfirmacion: boolean
+  documentacionAdicional: boolean
+  resolucionRecibida: boolean
+  fechaCreacion: string
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [stats, setStats] = useState<Stats>({
+    total: 0,
+    enEspera: 0,
+    resueltos: 0,
+    conConfirmacion: 0,
+    conDocumentacionAdicional: 0,
+  })
+  const [applications, setApplications] = useState<Application[]>([])
+  const [filteredPeriod, setFilteredPeriod] = useState<string>("")
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const fetchData = async (filters?: { startDate?: string; endDate?: string; month?: string }) => {
+    try {
+      let url = "/api/applications"
+      
+      if (filters) {
+        const params = new URLSearchParams()
+        if (filters.startDate && filters.endDate) {
+          params.append('startDate', filters.startDate)
+          params.append('endDate', filters.endDate)
+          setFilteredPeriod(`${filters.startDate} a ${filters.endDate}`)
+        } else if (filters.month) {
+          params.append('month', filters.month)
+          const [year, month] = filters.month.split('-')
+          const monthNames = [
+            'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+          ]
+          setFilteredPeriod(`${monthNames[parseInt(month) - 1]} ${year}`)
+        }
+        url += `?${params.toString()}`
+      } else {
+        setFilteredPeriod("")
+      }
+
+      const response = await fetch(url)
+      const data = await response.json()
+      if (data.success) {
+        setStats(data.stats)
+        setApplications(data.applications || [])
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error)
+    }
+  }
+
+  const updateApplication = async (id: string, updateData: Partial<Application>) => {
+    try {
+      const response = await fetch(`/api/applications/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        // Refrescar los datos después de actualizar
+        fetchData()
+      } else {
+        alert('Error al actualizar el trámite: ' + data.error)
+      }
+    } catch (error) {
+      console.error("Error updating application:", error)
+      alert('Error al actualizar el trámite')
+    }
+  }
+
+  const deleteApplication = async (id: string) => {
+    try {
+      const response = await fetch(`/api/applications/${id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        // Refrescar los datos después de eliminar
+        fetchData()
+      } else {
+        alert('Error al eliminar el trámite: ' + data.error)
+      }
+    } catch (error) {
+      console.error("Error deleting application:", error)
+      alert('Error al eliminar el trámite')
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-2">
+            Ciudadanía Española - Ley de Nietos
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Compartamos información sobre los tiempos de procesamiento de la ciudadanía española para ayudarnos mutuamente en este proceso.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Filtros de fecha */}
+        <DateFilters 
+          onFilterChange={fetchData}
+          onClearFilters={() => fetchData()}
+        />
+
+        {/* Stats Header */}
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            Estadísticas {filteredPeriod && <span className="text-primary">({filteredPeriod})</span>}
+          </h2>
+          <p className="text-muted-foreground">
+            {filteredPeriod 
+              ? `Datos filtrados para el período seleccionado`
+              : "Datos generales de todos los trámites registrados"
+            }
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <StatsCard
+            title="Total"
+            value={stats.total}
+            description="Trámites registrados"
+            icon={<IconWrapper color="blue"><Users className="h-4 w-4" /></IconWrapper>}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <StatsCard
+            title="En espera"
+            value={stats.enEspera}
+            description="Esperando resolución"
+            icon={<IconWrapper color="amber"><Clock className="h-4 w-4" /></IconWrapper>}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+          <StatsCard
+            title="Resueltos"
+            value={stats.resueltos}
+            description="Con resolución recibida"
+            icon={<IconWrapper color="green"><CheckCircle className="h-4 w-4" /></IconWrapper>}
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <StatsCard
+            title="Con confirmación"
+            value={stats.conConfirmacion}
+            description="Recibieron mail"
+            icon={<IconWrapper color="pink"><Mail className="h-4 w-4" /></IconWrapper>}
+          />
+          <StatsCard
+            title="Doc. adicional"
+            value={stats.conDocumentacionAdicional}
+            description="Requirieron más documentos"
+            icon={<IconWrapper color="amber"><FileText className="h-4 w-4" /></IconWrapper>}
+          />
+        </div>
+
+        {/* Form */}
+        <ApplicationForm onSubmit={() => fetchData()} />
+
+        {/* Applications List */}
+        <div className="mt-8">
+          <ApplicationsList 
+            applications={applications}
+            onUpdate={updateApplication}
+            onDelete={deleteApplication}
+          />
+        </div>        {/* Form */}
+        <ApplicationForm onSubmit={() => fetchData()} />
+
+        {/* Footer */}
+        <div className="text-center mt-12 text-sm text-muted-foreground">
+          <p>
+            Esta plataforma es una iniciativa comunitaria para compartir información sobre los tiempos de procesamiento
+            de la ciudadanía española.
+          </p>
+          <p className="mt-2">Los datos son proporcionados voluntariamente por la comunidad argentina.</p>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
