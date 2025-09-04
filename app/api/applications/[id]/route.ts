@@ -4,13 +4,14 @@ import Application from "../../../models/application"
 import mongoose from "mongoose"
 
 // Actualizar una aplicación específica
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log("[API] PUT /api/applications/[id] called with ID:", params.id)
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  console.log("[API] PUT /api/applications/[id] called with ID:", id)
   try {
     await connectDB()
 
     // Validar que el ID es válido
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: "ID de aplicación inválido" }, { status: 400 })
     }
 
@@ -18,7 +19,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     console.log("[API] Received update body:", body)
 
     const updatedApplication = await Application.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true, runValidators: true }
     )
@@ -36,17 +37,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Obtener una aplicación específica
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log("[API] GET /api/applications/[id] called with ID:", params.id)
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  console.log("[API] GET /api/applications/[id] called with ID:", id)
   try {
     await connectDB()
 
     // Validar que el ID es válido
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: "ID de aplicación inválido" }, { status: 400 })
     }
 
-    const application = await Application.findById(params.id)
+    const application = await Application.findById(id)
 
     if (!application) {
       return NextResponse.json({ success: false, error: "Aplicación no encontrada" }, { status: 404 })
@@ -60,17 +62,18 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Eliminar una aplicación específica
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  console.log("[API] DELETE /api/applications/[id] called with ID:", params.id)
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  console.log("[API] DELETE /api/applications/[id] called with ID:", id)
   try {
     await connectDB()
 
     // Validar que el ID es válido
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: "ID de aplicación inválido" }, { status: 400 })
     }
 
-    const deletedApplication = await Application.findByIdAndDelete(params.id)
+    const deletedApplication = await Application.findByIdAndDelete(id)
 
     if (!deletedApplication) {
       return NextResponse.json({ success: false, error: "Aplicación no encontrada" }, { status: 404 })

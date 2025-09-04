@@ -6,7 +6,6 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Card } from "./ui/card"
 import { Calendar, Filter, X } from "lucide-react"
-import { IconWrapper } from "./ui/icon"
 
 interface DateFiltersProps {
   onFilterChange: (filters: {

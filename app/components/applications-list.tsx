@@ -7,7 +7,6 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Checkbox } from "./ui/checkbox"
 import { Edit2, Save, X, Trash2, User } from "lucide-react"
-import { IconWrapper } from "./ui/icon"
 
 interface Application {
   _id: string

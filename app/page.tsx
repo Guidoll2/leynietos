@@ -6,7 +6,7 @@ import { ApplicationForm } from "./components/application-form"
 import { DateFilters } from "./components/date-filters"
 import { ApplicationsList } from "./components/applications-list"
 import { Clock, CheckCircle, Mail, FileText, Users } from "lucide-react"
-import { IconWrapper } from "./components/ui/icon"
+import { IconWrapper } from "./components/ui/_icon"
 
 interface Stats {
   total: number

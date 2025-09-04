@@ -52,7 +52,7 @@ export function ApplicationForm({ onSubmit }: { onSubmit: () => void }) {
       } else {
         throw new Error("Error al enviar el formulario")
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Hubo un problema al enviar tu información. Intenta nuevamente.",

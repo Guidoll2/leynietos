@@ -42,3 +42,6 @@ export function IconWrapper({ children, icon: Icon, color = "amber", size = "md"
     </span>
   )
 }
+
+// Add default export to avoid Next.js routing conflicts
+export default IconWrapper
