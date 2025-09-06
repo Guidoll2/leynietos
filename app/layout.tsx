@@ -1,19 +1,20 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Space_Grotesk, DM_Sans } from "next/font/google"
+import { Poppins, Inter } from "next/font/google"
 import "./globals.css"
 import Footer from "./components/footer"
 
-const spaceGrotesk = Space_Grotesk({
+const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-space-grotesk",
+  variable: "--font-poppins",
+  weight: ["300", "400", "500", "600", "700"],
 })
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-dm-sans",
+  variable: "--font-inter",
 })
 
 export const metadata: Metadata = {
@@ -28,9 +29,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${spaceGrotesk.variable} ${dmSans.variable} antialiased`}>
-      <body className="font-sans bg-gradient-to-b from-background to-background/80">
-        {children}
+    <html lang="es" className={`${poppins.variable} ${inter.variable} antialiased`}>
+      <body className="font-poppins bg-gradient-to-br from-blue-50 via-white to-red-50 min-h-screen">
+        <div className="animate-fade-in">
+          {children}
+        </div>
         <Footer />
       </body>
     </html>

@@ -16,7 +16,11 @@ export async function POST(request: NextRequest) {
     await application.save()
     console.log("[API] Application saved successfully")
 
-    return NextResponse.json({ success: true, data: application })
+    return NextResponse.json({ 
+      success: true, 
+      data: application,
+      editToken: application.editToken // Devolver el token al usuario
+    })
   } catch (error) {
     console.error("Error creating application:", error)
     return NextResponse.json({ success: false, error: "Error al crear la aplicación" }, { status: 500 })

@@ -6,7 +6,7 @@ import { Card } from "./ui/card"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Checkbox } from "./ui/checkbox"
-import { Edit2, Save, X, Trash2, User } from "lucide-react"
+import { Edit2, Save, X, Trash2, User, Lock, Key } from "lucide-react"
 
 interface Application {
   _id: string
@@ -21,13 +21,15 @@ interface Application {
 
 interface ApplicationsListProps {
   applications: Application[]
-  onUpdate: (id: string, data: Partial<Application>) => Promise<void>
-  onDelete: (id: string) => Promise<void>
+  onUpdate: (id: string, data: Partial<Application>, token: string) => Promise<void>
+  onDelete: (id: string, token: string) => Promise<void>
 }
 
 export function ApplicationsList({ applications, onUpdate, onDelete }: ApplicationsListProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<Application>>({})
+  const [editToken, setEditToken] = useState("")
+  const [tokenRequests, setTokenRequests] = useState<{ [key: string]: boolean }>({})
 
   const startEdit = (application: Application) => {
     setEditingId(application._id)
@@ -39,33 +41,45 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
       documentacionAdicional: application.documentacionAdicional,
       resolucionRecibida: application.resolucionRecibida,
     })
+    setEditToken("")
   }
 
   const cancelEdit = () => {
     setEditingId(null)
     setEditForm({})
+    setEditToken("")
   }
 
   const saveEdit = async () => {
-    if (!editingId) return
+    if (!editingId || !editToken.trim()) return
     
     try {
-      await onUpdate(editingId, editForm)
+      await onUpdate(editingId, editForm, editToken)
       setEditingId(null)
       setEditForm({})
+      setEditToken("")
     } catch (error) {
       console.error('Error updating application:', error)
     }
   }
 
   const handleDelete = async (id: string, nombre: string) => {
-    if (confirm(`¿Estás seguro de que quieres eliminar el trámite de ${nombre}?`)) {
+    const token = prompt(`Para eliminar el trámite de ${nombre}, ingresa tu token de edición:`)
+    if (token && confirm(`¿Estás seguro de que quieres eliminar el trámite de ${nombre}?`)) {
       try {
-        await onDelete(id)
+        await onDelete(id, token)
       } catch (error) {
         console.error('Error deleting application:', error)
       }
     }
+  }
+
+  const requestTokenInput = (appId: string) => {
+    setTokenRequests({ ...tokenRequests, [appId]: true })
+  }
+
+  const cancelTokenInput = (appId: string) => {
+    setTokenRequests({ ...tokenRequests, [appId]: false })
   }
 
   const formatDate = (dateString: string) => {
@@ -78,10 +92,10 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
 
   if (applications.length === 0) {
     return (
-      <Card className="p-8 text-center">
-        <User className="mx-auto mb-4 text-muted-foreground h-12 w-12" />
-        <h3 className="text-lg font-semibold mb-2">No hay trámites registrados</h3>
-        <p className="text-muted-foreground">
+      <Card className="p-8 text-center bg-white/40 border-white/30 backdrop-blur-lg">
+        <User className="mx-auto mb-4 text-slate-400 h-12 w-12" />
+        <h3 className="text-lg font-semibold mb-2 text-slate-800 font-poppins">No hay trámites registrados</h3>
+        <p className="text-slate-600 font-poppins">
           Los trámites que se registren aparecerán aquí.
         </p>
       </Card>
@@ -91,17 +105,36 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
-        <User className="text-primary h-5 w-5" />
-        <h3 className="text-lg font-semibold">
+        <User className="text-blue-600 h-5 w-5" />
+        <h3 className="text-lg font-semibold text-slate-800 font-poppins">
           Trámites registrados ({applications.length})
         </h3>
       </div>
 
-      {applications.map((app) => (
-        <Card key={app._id} className="p-4">
+      {applications.map((app, index) => (
+        <Card key={app._id} className={`p-4 bg-white/40 border-white/30 backdrop-blur-lg animate-slide-up`} style={{animationDelay: `${index * 0.1}s`}}>
           {editingId === app._id ? (
             // Modo edición
             <div className="space-y-4">
+              <div className="flex items-center gap-2 p-3 bg-yellow-100/80 rounded-lg border border-yellow-300/50 backdrop-blur-sm">
+                <Lock className="h-5 w-5 text-yellow-600" />
+                <span className="text-sm text-yellow-800 font-medium">
+                  Necesitas el token de edición para modificar este registro
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor={`token-${app._id}`}>Token de edición *</Label>
+                <Input
+                  id={`token-${app._id}`}
+                  type="password"
+                  value={editToken}
+                  onChange={(e) => setEditToken(e.target.value)}
+                  placeholder="Ingresa tu token de edición"
+                  className="font-mono"
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor={`nombre-${app._id}`}>Nombre *</Label>
@@ -177,7 +210,7 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
               <div className="flex gap-2 pt-2">
                 <Button
                   onClick={saveEdit}
-                  disabled={!editForm.nombre || !editForm.fechaTramite}
+                  disabled={!editForm.nombre || !editForm.fechaTramite || !editToken.trim()}
                   className="flex items-center gap-2"
                 >
                   <Save className="h-4 w-4" />
@@ -215,7 +248,7 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
                     size="sm"
                     className="flex items-center gap-1"
                   >
-                    <Edit2 className="h-4 w-4" />
+                    <Key className="h-4 w-4" />
                     Editar
                   </Button>
                   <Button

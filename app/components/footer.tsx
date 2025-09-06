@@ -14,10 +14,10 @@ function IconCircle({ children, bg }: { children: React.ReactNode; bg: string })
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-gray-200 dark:border-gray-800 py-6">
-      <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+    <footer className="w-full border-t border-white/20 backdrop-blur-sm bg-white/10 py-6 mt-12">
+      <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-sm text-slate-600">
         <div className="flex items-center space-x-3">
-          <div>© {new Date().getFullYear()} Guido Llaurado</div>
+          <div className="font-poppins">© {new Date().getFullYear()} Guido Llaurado</div>
         </div>
 
         <div className="flex items-center space-x-4 mt-3 md:mt-0">

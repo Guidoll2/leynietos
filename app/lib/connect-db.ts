@@ -1,6 +1,10 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const connectionString = `mongodb+srv://guidoll:Ellesar33.@emplearg.mongocluster.cosmos.azure.com/leydenietos?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000`;
+const connectionString = process.env.MONGODB_URI;
+
+if (!connectionString) {
+  throw new Error('La variable de entorno MONGODB_URI no está definida');
+}
 
 // Definimos una variable "globalForMongoose" para evitar errores de tipos
 const globalForMongoose = globalThis as typeof globalThis & {

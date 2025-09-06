@@ -1,33 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Updated color tokens to match Spanish citizenship dashboard design */
-  --background: 0 0% 100%; /* #ffffff */
+  /* Updated color tokens with pastel Argentina-Spain gradient theme */
+  --background: 210 100% 98%; /* very light blue */
   --foreground: 224 6% 22%; /* #374151 */
-  --card: 54 91% 95%; /* #fefce8 */
+  --card: 0 0% 100%/0.8; /* white with transparency for glass effect */
   --card-foreground: 224 6% 22%; /* #374151 */
   --popover: 0 0% 100%; /* #ffffff */
   --popover-foreground: 224 6% 22%; /* #374151 */
-  --primary: 33 81% 43%; /* #d97706 amber-600 */
+  --primary: 210 89% 65%; /* soft blue from Argentina flag */
   --primary-foreground: 0 0% 100%; /* #ffffff */
-  --secondary: 54 91% 95%; /* #fefce8 */
+  --secondary: 0 45% 85%; /* soft red from Spain flag */
   --secondary-foreground: 224 6% 22%; /* #374151 */
   --muted: 210 15% 95%; /* #f1f5f9 */
   --muted-foreground: 220 9% 42%; /* #6b7280 */
-  --accent: 33 81% 43%; /* #d97706 */
-  --accent-foreground: 0 0% 100%; /* #ffffff */
+  --accent: 45 93% 78%; /* soft yellow accent */
+  --accent-foreground: 224 6% 22%; /* #374151 */
   --destructive: 0 73% 60%; /* #ef4444 */
   --destructive-foreground: 0 0% 100%; /* #ffffff */
-  --border: 220 13% 91%; /* #e5e7eb */
-  --input: 0 0% 100%; /* #ffffff */
-  --ring: 33 81% 43%; /* #d97706 */
-  --radius: 0.5rem;
+  --border: 220 13% 91%/0.3; /* transparent border */
+  --input: 0 0% 100%/0.9; /* slightly transparent input */
+  --ring: 210 89% 65%; /* soft blue */
+  --radius: 0.75rem;
 
-  /* Pastel palette for subtle icon backgrounds */
-  --pastel-amber: 38 96% 84%; /* soft amber */
-  --pastel-blue: 210 90% 92%; /* soft blue */
-  --pastel-green: 150 60% 90%; /* soft green */
-  --pastel-pink: 340 70% 94%; /* soft pink */
+  /* Pastel palette for subtle backgrounds */
+  --pastel-blue: 210 100% 95%; /* Argentina blue pastel */
+  --pastel-red: 0 45% 95%; /* Spain red pastel */
+  --pastel-yellow: 45 93% 90%; /* Spain yellow pastel */
+  --pastel-white: 0 0% 98%; /* soft white */
+  
+  /* Glass effect variables */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
 }
 
 .icon-bg {
@@ -37,6 +41,91 @@
   border-radius: 9999px;
   width: 2rem;
   height: 2rem;
+  backdrop-filter: blur(10px);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+}
+
+/* Glass morphism effect for cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Subtle gradient background */
+.gradient-bg {
+  background: linear-gradient(135deg, 
+    hsl(210, 100%, 98%) 0%,
+    hsl(210, 85%, 96%) 25%,
+    hsl(0, 0%, 99%) 50%,
+    hsl(45, 60%, 96%) 75%,
+    hsl(0, 45%, 97%) 100%
+  );
+}
+
+/* Animation keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease-out;
+}
+
+.animate-delay-100 {
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
 }
 
 .dark {
@@ -67,6 +156,28 @@
 }
 
 body {
-  background-color: hsl(var(--background));
+  background: linear-gradient(135deg, 
+    #e3f2fd 0%,
+    #f8fbff 25%,
+    #ffffff 50%,
+    #fff8e1 75%,
+    #ffebee 100%
+  );
   color: hsl(var(--foreground));
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+/* Enhanced glass effects */
+.glass-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.4);
 }

@@ -49,10 +49,10 @@ export function DateFilters({ onFilterChange, onClearFilters }: DateFiltersProps
   }
 
   return (
-    <Card className="p-6 mb-6">
+    <Card className="p-6 mb-6 bg-white/40 border-white/30 backdrop-blur-lg">
       <div className="flex items-center gap-2 mb-4">
-        <Filter className="text-primary h-5 w-5" />
-        <h3 className="text-lg font-semibold">Filtrar por fecha de trámite</h3>
+        <Filter className="text-blue-600 h-5 w-5" />
+        <h3 className="text-lg font-semibold text-slate-800 font-poppins">Filtrar por fecha de trámite</h3>
       </div>
 
       <div className="space-y-4">

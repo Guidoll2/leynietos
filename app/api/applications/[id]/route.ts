@@ -16,17 +16,36 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const body = await request.json()
+    const { editToken, ...updateData } = body
     console.log("[API] Received update body:", body)
 
-    const updatedApplication = await Application.findByIdAndUpdate(
-      id,
-      body,
-      { new: true, runValidators: true }
-    )
+    // Verificar que se proporcionó el token
+    if (!editToken) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Token de edición requerido" 
+      }, { status: 401 })
+    }
 
-    if (!updatedApplication) {
+    // Buscar la aplicación y verificar el token
+    const application = await Application.findById(id)
+    if (!application) {
       return NextResponse.json({ success: false, error: "Aplicación no encontrada" }, { status: 404 })
     }
+
+    if (application.editToken !== editToken) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Token de edición inválido" 
+      }, { status: 403 })
+    }
+
+    // Actualizar la aplicación (sin incluir el editToken en los datos)
+    const updatedApplication = await Application.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    )
 
     console.log("[API] Application updated successfully")
     return NextResponse.json({ success: true, data: updatedApplication })
@@ -73,11 +92,32 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ success: false, error: "ID de aplicación inválido" }, { status: 400 })
     }
 
-    const deletedApplication = await Application.findByIdAndDelete(id)
+    const body = await request.json()
+    const { editToken } = body
 
-    if (!deletedApplication) {
+    // Verificar que se proporcionó el token
+    if (!editToken) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Token de edición requerido" 
+      }, { status: 401 })
+    }
+
+    // Buscar la aplicación y verificar el token
+    const application = await Application.findById(id)
+    if (!application) {
       return NextResponse.json({ success: false, error: "Aplicación no encontrada" }, { status: 404 })
     }
+
+    if (application.editToken !== editToken) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Token de edición inválido" 
+      }, { status: 403 })
+    }
+
+    // Eliminar la aplicación
+    const deletedApplication = await Application.findByIdAndDelete(id)
 
     console.log("[API] Application deleted successfully")
     return NextResponse.json({ success: true, message: "Aplicación eliminada correctamente" })

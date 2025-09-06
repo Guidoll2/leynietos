@@ -73,14 +73,14 @@ export default function Home() {
     }
   }
 
-  const updateApplication = async (id: string, updateData: Partial<Application>) => {
+  const updateApplication = async (id: string, updateData: Partial<Application>, token: string) => {
     try {
       const response = await fetch(`/api/applications/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({ ...updateData, editToken: token }),
       })
 
       const data = await response.json()
@@ -96,10 +96,14 @@ export default function Home() {
     }
   }
 
-  const deleteApplication = async (id: string) => {
+  const deleteApplication = async (id: string, token: string) => {
     try {
       const response = await fetch(`/api/applications/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ editToken: token }),
       })
 
       const data = await response.json()
@@ -120,31 +124,32 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-bg">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-2">
+        <div className="text-center mb-8 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-poppins font-bold text-slate-800 mb-2">
             Ciudadanía Española - Ley de Nietos
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-slate-600 max-w-2xl mx-auto font-poppins">
             Compartamos información sobre los tiempos de procesamiento de la ciudadanía española para ayudarnos mutuamente en este proceso.
           </p>
         </div>
 
         {/* Filtros de fecha */}
-        <DateFilters 
-          onFilterChange={fetchData}
-          onClearFilters={() => fetchData()}
-        />
+        <div className="animate-slide-up animate-delay-100">
+          <DateFilters 
+            onFilterChange={fetchData}
+            onClearFilters={() => fetchData()}
+          />
+        </div>
 
         {/* Stats Header */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Estadísticas {filteredPeriod && <span className="text-primary">({filteredPeriod})</span>}
+        <div className="text-center mb-6 animate-slide-up animate-delay-200">
+          <h2 className="text-2xl font-bold text-slate-800 mb-2 font-poppins">
+            Estadísticas {filteredPeriod && <span className="text-blue-600">({filteredPeriod})</span>}
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-slate-600 font-poppins">
             {filteredPeriod 
               ? `Datos filtrados para el período seleccionado`
               : "Datos generales de todos los trámites registrados"
@@ -153,59 +158,70 @@ export default function Home() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <StatsCard
-            title="Total"
-            value={stats.total}
-            description="Trámites registrados"
-            icon={<IconWrapper color="blue"><Users className="h-4 w-4" /></IconWrapper>}
-          />
-          <StatsCard
-            title="En espera"
-            value={stats.enEspera}
-            description="Esperando resolución"
-            icon={<IconWrapper color="amber"><Clock className="h-4 w-4" /></IconWrapper>}
-          />
-          <StatsCard
-            title="Resueltos"
-            value={stats.resueltos}
-            description="Con resolución recibida"
-            icon={<IconWrapper color="green"><CheckCircle className="h-4 w-4" /></IconWrapper>}
-          />
-          <StatsCard
-            title="Con confirmación"
-            value={stats.conConfirmacion}
-            description="Recibieron mail"
-            icon={<IconWrapper color="pink"><Mail className="h-4 w-4" /></IconWrapper>}
-          />
-          <StatsCard
-            title="Doc. adicional"
-            value={stats.conDocumentacionAdicional}
-            description="Requirieron más documentos"
-            icon={<IconWrapper color="amber"><FileText className="h-4 w-4" /></IconWrapper>}
-          />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 animate-slide-up animate-delay-300">
+          <div className="animate-scale-in">
+            <StatsCard
+              title="Total"
+              value={stats.total}
+              description="Trámites registrados"
+              icon={<IconWrapper color="blue"><Users className="h-4 w-4" /></IconWrapper>}
+            />
+          </div>
+          <div className="animate-scale-in animate-delay-100">
+            <StatsCard
+              title="En espera"
+              value={stats.enEspera}
+              description="Esperando resolución"
+              icon={<IconWrapper color="amber"><Clock className="h-4 w-4" /></IconWrapper>}
+            />
+          </div>
+          <div className="animate-scale-in animate-delay-200">
+            <StatsCard
+              title="Resueltos"
+              value={stats.resueltos}
+              description="Con resolución recibida"
+              icon={<IconWrapper color="green"><CheckCircle className="h-4 w-4" /></IconWrapper>}
+            />
+          </div>
+          <div className="animate-scale-in animate-delay-300">
+            <StatsCard
+              title="Con confirmación"
+              value={stats.conConfirmacion}
+              description="Recibieron mail"
+              icon={<IconWrapper color="pink"><Mail className="h-4 w-4" /></IconWrapper>}
+            />
+          </div>
+          <div className="animate-scale-in animate-delay-300">
+            <StatsCard
+              title="Doc. adicional"
+              value={stats.conDocumentacionAdicional}
+              description="Requirieron más documentos"
+              icon={<IconWrapper color="amber"><FileText className="h-4 w-4" /></IconWrapper>}
+            />
+          </div>
         </div>
 
         {/* Form */}
-        <ApplicationForm onSubmit={() => fetchData()} />
+        <div className="animate-slide-up animate-delay-300">
+          <ApplicationForm onSubmit={() => fetchData()} />
+        </div>
 
         {/* Applications List */}
-        <div className="mt-8">
+        <div className="mt-8 animate-slide-up animate-delay-300">
           <ApplicationsList 
             applications={applications}
             onUpdate={updateApplication}
             onDelete={deleteApplication}
           />
-        </div>        {/* Form */}
-        <ApplicationForm onSubmit={() => fetchData()} />
+        </div>
 
         {/* Footer */}
-        <div className="text-center mt-12 text-sm text-muted-foreground">
-          <p>
+        <div className="text-center mt-12 text-sm text-slate-500 animate-fade-in animate-delay-300">
+          <p className="font-poppins">
             Esta plataforma es una iniciativa comunitaria para compartir información sobre los tiempos de procesamiento
             de la ciudadanía española.
           </p>
-          <p className="mt-2">Los datos son proporcionados voluntariamente por la comunidad argentina.</p>
+          <p className="mt-2 font-poppins">Los datos son proporcionados voluntariamente por la comunidad argentina.</p>
         </div>
       </div>
     </div>

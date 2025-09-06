@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import crypto from "crypto"
 
 const ApplicationSchema = new mongoose.Schema({
   nombre: {
@@ -25,6 +26,11 @@ const ApplicationSchema = new mongoose.Schema({
   resolucionRecibida: {
     type: Boolean,
     default: false,
+  },
+  editToken: {
+    type: String,
+    required: true,
+    default: () => crypto.randomBytes(16).toString('hex'), // Token único de 32 caracteres
   },
   fechaCreacion: {
     type: Date,
