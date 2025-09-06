@@ -181,3 +181,46 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.4);
 }
+
+/* Footer promotional section animations */
+.footer-promo {
+  animation: fade-in 0.8s ease-out;
+}
+
+.footer-promo .glass-card {
+  transition: all 0.3s ease;
+}
+
+.footer-promo .glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.3);
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced hover effects for footer links */
+.footer-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.footer-link:hover::before {
+  left: 100%;
+}

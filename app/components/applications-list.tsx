@@ -6,7 +6,7 @@ import { Card } from "./ui/card"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Checkbox } from "./ui/checkbox"
-import { Edit2, Save, X, Trash2, User, Lock, Key } from "lucide-react"
+import { Save, X, Trash2, User, Lock, Key } from "lucide-react"
 
 interface Application {
   _id: string
@@ -29,7 +29,6 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<Application>>({})
   const [editToken, setEditToken] = useState("")
-  const [tokenRequests, setTokenRequests] = useState<{ [key: string]: boolean }>({})
 
   const startEdit = (application: Application) => {
     setEditingId(application._id)
@@ -72,14 +71,6 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
         console.error('Error deleting application:', error)
       }
     }
-  }
-
-  const requestTokenInput = (appId: string) => {
-    setTokenRequests({ ...tokenRequests, [appId]: true })
-  }
-
-  const cancelTokenInput = (appId: string) => {
-    setTokenRequests({ ...tokenRequests, [appId]: false })
   }
 
   const formatDate = (dateString: string) => {

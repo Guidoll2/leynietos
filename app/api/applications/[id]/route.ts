@@ -117,7 +117,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     // Eliminar la aplicación
-    const deletedApplication = await Application.findByIdAndDelete(id)
+    await Application.findByIdAndDelete(id)
 
     console.log("[API] Application deleted successfully")
     return NextResponse.json({ success: true, message: "Aplicación eliminada correctamente" })
