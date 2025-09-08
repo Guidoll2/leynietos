@@ -7,6 +7,7 @@ import { DateFilters } from "./components/date-filters"
 import { ApplicationsList } from "./components/applications-list"
 import { Clock, CheckCircle, Mail, FileText, Users } from "lucide-react"
 import { IconWrapper } from "./components/ui/_icon"
+import { formatDateToDDMMYYYY } from "./lib/utils"
 
 interface Stats {
   total: number
@@ -47,7 +48,7 @@ export default function Home() {
         if (filters.startDate && filters.endDate) {
           params.append('startDate', filters.startDate)
           params.append('endDate', filters.endDate)
-          setFilteredPeriod(`${filters.startDate} a ${filters.endDate}`)
+          setFilteredPeriod(`${formatDateToDDMMYYYY(filters.startDate)} a ${formatDateToDDMMYYYY(filters.endDate)}`)
         } else if (filters.month) {
           params.append('month', filters.month)
           const [year, month] = filters.month.split('-')

@@ -7,6 +7,7 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Checkbox } from "./ui/checkbox"
 import { Save, X, Trash2, User, Lock, Key } from "lucide-react"
+import { formatDateToDDMMYYYY } from "../lib/utils"
 
 interface Application {
   _id: string
@@ -73,13 +74,7 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+  // Usar la función utilitaria para formatear fechas
 
   if (applications.length === 0) {
     return (
@@ -226,10 +221,10 @@ export function ApplicationsList({ applications, onUpdate, onDelete }: Applicati
                     {app.nombre} {app.apellido}
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    Trámite: {formatDate(app.fechaTramite)}
+                    Trámite: {formatDateToDDMMYYYY(app.fechaTramite)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Registrado: {formatDate(app.fechaCreacion)}
+                    Registrado: {formatDateToDDMMYYYY(app.fechaCreacion)}
                   </p>
                 </div>
                 <div className="flex gap-2">
